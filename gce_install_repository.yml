@@ -1,0 +1,20 @@
+---
+- name: "Create Repository Instance"
+  hosts: localhost
+  roles:
+    - ocp_gce
+
+- name: "Configure Red Hat Susbcription"
+  hosts: openshift_repository_hosts
+  roles:
+    - rhsm_configuration
+
+- name: "Preparing Repository hosts"
+  hosts: openshift_repository_hosts
+  roles:
+    - prepare_host
+
+- name: "Synchronize and Create Repositories"
+  hosts: openshift_repository_hosts
+  roles:
+    - synchronize_repos

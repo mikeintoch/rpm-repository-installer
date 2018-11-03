@@ -1,0 +1,14 @@
+prereqs:
+  - vim
+  - wget
+  - git
+  - net-tools
+  - bind-utils
+  - bridge-utils
+  - bash-completion
+  - yum-utils
+  - createrepo
+  - httpd
+disk_storage: /dev/sdb
+disk_storage_partition: /dev/sdb1
+disk_storage_directory: "/var/storage/repos"

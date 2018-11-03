@@ -1,0 +1,8 @@
+- name: Downloading repositories (FINAL STEP 1/2)
+  command: reposync --gpgcheck -lm --repoid={{ item }} --download_path={{ disk_storage_directory }}
+  with_items: "{{ repositories }}"
+
+
+- name: Creating Repositories (FINAL STEP 2/2)
+  command: createrepo -v {{ disk_storage_directory }}/{{ item }} -o {{ disk_storage_directory }}/{{ item }}
+  with_items: "{{ repositories }}"

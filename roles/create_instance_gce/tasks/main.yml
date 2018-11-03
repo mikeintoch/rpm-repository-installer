@@ -1,0 +1,51 @@
+- name: "Create GCE {{ instance_repository_name }} Instance"
+  gce:
+    instance_names: "{{ instance_repository_name }}"
+    zone: "{{ gce_default_zone }}"
+    machine_type: "{{ gce_default_machine_type }}"
+    image: "{{ gce_default_image }}"
+    network: "{{ gce_default_network_name }}"
+    subnetwork: "{{ gce_default_subnetwork_name }}"
+    tags: ["enable-ssh"]
+    disk_auto_delete: True
+    project_id: "{{ gce_project_id }}"
+    credentials_file: "{{ gce_credentials_file }}"
+    service_account_email: "{{ gce_service_account_email }}"
+  register: gce
+
+- name: "Attach Persistent Disk for Repository Storage to {{ instance_repository_name }}"
+  gce_pd:
+    instance_name: "{{ instance_repository_name }}"
+    name: "{{ instance_repository_name }}-storage"
+    state: present
+    mode: READ_WRITE
+    disk_type: pd-standard
+    size_gb: "{{ gce_default_storage_size }}"
+    zone: "{{ gce_default_zone }}"
+    project_id: "{{ gce_project_id }}"
+    delete_on_termination: true
+    credentials_file: "{{ gce_credentials_file }}"
+    service_account_email: "{{ gce_service_account_email }}"
+
+- name: Save host {{ instance_repository_name  }} data
+  add_host:
+    hostname: "{{ instance.public_ip }}"
+    groupname: openshift_repository_hosts
+    ansible_user: "{{ ssh_default_image_user }}"
+    ansible_password: "{{ ssh_default_image_password }}"
+    instance_name: "{{ instance_repository_name }}"
+    private_ip: "{{ instance.private_ip}}"
+  with_items: "{{ gce.instance_data}}"
+  loop_control:
+      loop_var: instance
+
+- name: Wait for SSH for {{ instance_repository_name }}
+  wait_for:
+    delay: 1
+    host: "{{ instance.public_ip }}"
+    port: 22
+    state: started
+    timeout: 30
+  with_items: "{{ gce.instance_data }}"
+  loop_control:
+    loop_var: instance

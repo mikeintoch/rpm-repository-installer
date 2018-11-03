@@ -1,0 +1,4 @@
+---
+- name: "Create Repository Instances"
+  include_role:
+    name: create_instance_gce

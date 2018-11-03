@@ -1,0 +1,19 @@
+---
+- name: Subscribe instance to Red Hat Subscription Management.
+  redhat_subscription:
+    state: present
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+    pool_ids: "{{ rhn_pool_id }}"
+
+- name: Disable all RHSM repositories
+  rhsm_repository:
+    name: '*'
+    state: disabled
+
+- name: Enable all repositories 
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - "{{ repositories }}"

@@ -1,0 +1,55 @@
+- name: "Install Prerequirement packages"
+  yum:
+    name: "{{ prereqs }}"
+    state: latest
+
+- name: "Create Repository Partition"
+  parted:
+    device: "{{ disk_storage }}"
+    number: 1
+    state: present
+
+- name: Create a xfs filesystem on {{ disk_storage_partition }}
+  filesystem:
+    fstype: xfs
+    force: yes
+    dev: "{{ disk_storage_partition }}"
+
+- name: Create a directory where all the content will be
+  file: 
+    path: "{{ disk_storage_directory }}" 
+    state: directory
+    recurse: yes
+
+- name: Mount storage area{{ ':' }} {{ disk_storage_partition }} at {{ disk_storage_directory }}
+  mount: 
+    src: "{{ disk_storage_partition }}"
+    path: "{{ disk_storage_directory }}" 
+    fstype: xfs 
+    state: mounted
+
+- name: Adjust Apache WebServer's Configuration to serve from{{ ':' }} {{ disk_storage_directory }} (Step 1/2)
+  lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^DocumentRoot" line="DocumentRoot \"{{ disk_storage_directory }}\""
+
+- name: Adjust Apache WebServer's Configuration to serve from{{ ':' }} {{ disk_storage_directory }} (Step 2/2)
+  lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^[<]Directory ["]/var/www/html["]" line="<Directory \"{{ disk_storage_directory }}\">"
+
+- name: Start Apache Web Server
+  service: 
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Enable Port 80 on Firewall
+  firewalld:
+    zone: public 
+    service: http 
+    state: enabled
+    permanent: true
+    immediate: true
+
+- name: Adjust SELinux permission and set type{{ ':' }} httpd_sys_content_t
+  file: 
+    path: "{{ disk_storage_directory }}"
+    recurse: True 
+    setype: httpd_sys_content_t

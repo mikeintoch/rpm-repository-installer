@@ -1,0 +1,22 @@
+
+# GCE AUTHENTICATION
+gce_service_account_email: << your gce account email >>
+gce_credentials_file: << your gce json credentials file >>
+gce_project_id: << your gce project id >>
+
+# GCE DEFAULT CONFIGURATION
+gce_default_region: << your gce region >>
+gce_default_zone:  << your gce zone >>
+gce_default_network_name: << your gce network name >>
+gce_default_subnetwork_name: << yout gce subnetwork name >>
+gce_default_subnetwork_range: << your gce subnetwork range >>
+gce_default_image: << your rhel image name >>
+gce_default_storage_size: << your repository storage size >>
+gce_default_machine_type: << your machine type >>
+
+
+# INSTALLATION DEFAULT
+ssh_default_image_user: << your image user >>
+ssh_default_image_password: << your password >>
+ssh_default_image_port: << ssh default port >>
+instance_repository_name: << your gce instance name >>
